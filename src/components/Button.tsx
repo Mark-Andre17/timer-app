@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useState, useCallback } from 'react'
 import '../assets/styles/button.css'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import PauseIcon from '@mui/icons-material/Pause'
@@ -13,7 +13,7 @@ export const Button: FC<ButtonProps> = ({ setMiliseconds, ms }) => {
 
     const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | null>(null)
     
-    const startTimer = (): void => {
+    function startTimer(): void {
         if (intervalId === null) {
             const newInterval = setInterval(() => {
                 setMiliseconds(ms = ms + 10);
@@ -21,28 +21,32 @@ export const Button: FC<ButtonProps> = ({ setMiliseconds, ms }) => {
         setIntervalId(newInterval)
         } 
     }
-    
-    const stopTimer = (): void => {
-        if (intervalId!== null) {
+
+    function pauseTimer(): void  {
+        if (intervalId !== null) {
             clearInterval(intervalId)
             setIntervalId(null)
         }
-        setMiliseconds(0)
     }
 
-    const pauseTimer = (): void => {
-        if (intervalId!== null) {
+    function stopTimer(): void {
+        if (intervalId !== null && ms > 0) {
+            pauseTimer()
             clearInterval(intervalId)
             setIntervalId(null)
+        }else if(ms){
+            setMiliseconds(0)
         }
     }
+
+    const start = useCallback(() => startTimer(),[])
 
     return (
         <div className="buttons">
             {/* <div className="wrapper"></div>
             <div className="wrapper"></div>
             <div className="wrapper"></div> */}
-            <button className='btn' onClick={startTimer}><PlayArrowIcon/></button>
+            <button className='btn' onClick={start}><PlayArrowIcon/></button>
             <button className='btn' onClick={stopTimer}><ClearIcon/></button>
             <button className='btn' onClick={pauseTimer}><PauseIcon/></button>
         </div>
